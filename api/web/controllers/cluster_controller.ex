@@ -6,25 +6,26 @@ defmodule Api.ClusterController do
 
     case res do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} -> {:ok, body}
-      _ -> {:error}
+      _ -> {:error, "error fetching services"}
     end
   end
 
+  def decode({:ok, body}) do
+    Poison.decode(body)
+  end
+
+  def decode(error) do
+    error
+  end
+
   def show(conn, _params) do
-    case get_services do
-      {:ok, body} ->
-        case Poison.decode(body) do
-          {:ok, services} ->
-            json conn, %{services: services}
-          _ ->
-            conn
-            |> put_status(500)
-            |> json(%{error: "sorry"})
-        end
+    case decode(get_services) do
+      {:ok, services} ->
+        json conn, %{services: services}
       _ ->
         conn
         |> put_status(500)
-        |> json(%{error: "sorry"})
+        |> json(%{error: "sorry http failed"})
     end
   end
 end
