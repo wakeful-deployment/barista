@@ -17,7 +17,7 @@ defmodule Api.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Api, []},
-     applications: [:phoenix, :cowboy, :logger]]
+     applications: [:phoenix, :cowboy, :logger, :httpoison]]
   end
 
   # Specifies which paths to compile per environment.
@@ -30,6 +30,7 @@ defmodule Api.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.1.1"},
      {:gettext, "~> 0.9"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:httpoison, "~> 0.8.0"}]
   end
 end
