@@ -3,9 +3,23 @@ module Barista where
 import Json.Decode as Json exposing ((:=))
 import Graphics.Element as Element exposing (Element)
 import Dict exposing (Dict)
+import Signal exposing (Signal)
+import Html exposing (Html)
 
-main : Element
-main = Element.show <| decodeJson fakeData
+main : Signal Html
+main = Signal.map view clusters
+
+-- View
+view : Maybe Cluster -> Html
+view cluster =
+  case cluster of
+    Just c -> Html.div [] [Html.text "By George, it worked!"]
+    Nothing -> Html.div [] [Html.text "Hot damn... it didn't work..."]
+
+-- Model
+clusters : Signal (Maybe Cluster)
+clusters =
+  Signal.map (decodeJson >> Result.toMaybe) fakeData
 
 type alias Cluster =
   { name: String
@@ -82,7 +96,6 @@ instancesAmount =
   in
     Json.oneOf [everyNode, range]
 
-
 nodeInfo : Json.Decoder NodeInfo
 nodeInfo =
   Json.object6 NodeInfo
@@ -110,11 +123,8 @@ portMapping =
     ("outgoing" := Json.int)
     ("udp"      := Json.bool)
 
--- view : Cluster -> Html
-
-
-fakeData : String
-fakeData = """
+fakeData : Signal String
+fakeData = Signal.constant """
 {
   "name": "nathan-1",
   "location": "westeurope",
