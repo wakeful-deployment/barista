@@ -13,10 +13,7 @@ defmodule Api.ClusterController do
   def decode({:ok, body}) do
     Poison.decode(body)
   end
-
-  def decode(error) do
-    error
-  end
+  def decode(error), do: error
 
   def show(conn, _params) do
     case decode(get_services) do
