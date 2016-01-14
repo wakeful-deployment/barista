@@ -1,26 +1,24 @@
 module Main where
 
-import Graphics.Element as Element exposing (Element)
 import Dict exposing (Dict)
 import Signal exposing (Signal)
 import Html exposing (Html)
-import Model exposing (..)
+import Model
 
 main : Signal Html
-main = Signal.map view clusters
+main = Signal.map view Model.clusters
 
--- View
-view : Cluster -> Html
+view : Model.Cluster -> Html
 view cluster  =
   Html.div []
     [ renderTitle cluster
     , renderNodes cluster.nodes]
 
-renderTitle : Cluster -> Html
+renderTitle : Model.Cluster -> Html
 renderTitle cluster =
   Html.h1 [] [Html.text ("Name: '" ++ cluster.name ++ "'")]
 
-renderNodes : Dict String NodeInfo -> Html
+renderNodes : Dict String Model.NodeInfo -> Html
 renderNodes nodes =
   let
       title = Html.h2 [] [Html.text "Nodes:"]
@@ -28,7 +26,7 @@ renderNodes nodes =
   in
     Html.div [] [title,  table]
 
-renderNodesTable : List (String, NodeInfo) -> Html
+renderNodesTable : List (String, Model.NodeInfo) -> Html
 renderNodesTable nodes =
   let
       headerRow =
@@ -44,7 +42,7 @@ renderNodesTable nodes =
   in
     Html.table [] (headerRow :: nodesRows)
 
-renderNode : (String, NodeInfo) -> Html
+renderNode : (String, Model.NodeInfo) -> Html
 renderNode (nodeName, info) =
   Html.tr []
     [ Html.td [] [Html.text nodeName]
