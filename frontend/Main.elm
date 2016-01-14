@@ -10,16 +10,59 @@ main : Signal Html
 main = Signal.map view clusters
 
 -- View
-view : Maybe Cluster -> Html
-view cluster =
-  case cluster of
-    Just c -> Html.div [] [Html.text "By George, it worked!"]
-    Nothing -> Html.div [] [Html.text "Hot damn... it didn't work..."]
+view : Cluster -> Html
+view cluster  =
+  Html.div []
+    [ renderTitle cluster
+    , renderNodes cluster.nodes]
+
+renderTitle : Cluster -> Html
+renderTitle cluster =
+  Html.h1 [] [Html.text ("Name: '" ++ cluster.name ++ "'")]
+
+renderNodes : Dict String NodeInfo -> Html
+renderNodes nodes =
+  let
+      title = Html.h2 [] [Html.text "Nodes:"]
+      table = renderNodesTable <| Dict.toList nodes
+  in
+    Html.div [] [title,  table]
+
+renderNodesTable : List (String, NodeInfo) -> Html
+renderNodesTable nodes =
+  let
+      headerRow =
+        Html.tr []
+            [ Html.th [] [Html.text "Name"]
+            , Html.th [] [Html.text "IP"]
+            , Html.th [] [Html.text "Size"]
+            , Html.th [] [Html.text "Registered"]
+            , Html.th [] [Html.text "Healthy"]
+            , Html.th [] [Html.text "Created At"]
+            ]
+      nodesRows = List.map renderNode nodes
+  in
+    Html.table [] (headerRow :: nodesRows)
+
+renderNode : (String, NodeInfo) -> Html
+renderNode (nodeName, info) =
+  Html.tr []
+    [ Html.td [] [Html.text nodeName]
+    , Html.td [] [Html.text info.ip]
+    , Html.td [] [Html.text info.size]
+    , Html.td [] [Html.text <| toString info.registered]
+    , Html.td [] [Html.text <| toString info.healthy]
+    , Html.td [] [Html.text info.createdAt]
+    ]
 
 -- Model
-clusters : Signal (Maybe Cluster)
+clusters : Signal Cluster
 clusters =
-  Signal.map (decodeJson >> Result.toMaybe) fakeData
+  let
+      maybeClusters =
+        Signal.map (decodeJson >> Result.toMaybe) fakeData
+  in
+     Signal.filterMap identity blankCluster maybeClusters
 
 type alias Cluster =
   { name: String
@@ -29,6 +72,17 @@ type alias Cluster =
   , sshProxy: String
   , services: Dict String ServiceSummary
   , nodes: Dict String NodeInfo
+  }
+
+blankCluster : Cluster
+blankCluster =
+  { name = ""
+  , location = ""
+  , resourceGroup = ""
+  , storageAccount = ""
+  , sshProxy = ""
+  , services = Dict.empty
+  , nodes = Dict.empty
   }
 
 type alias ServiceSummary =
